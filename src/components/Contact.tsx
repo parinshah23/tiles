@@ -1,9 +1,56 @@
+import { useState } from "react"; // 1. Import useState
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { db } from "@/firebaseConfig"; // 2. Import db
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"; // 3. Import firestore functions
 
 export const Contact = () => {
+  // 4. Add state for form inputs, loading, and success message
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [formMessage, setFormMessage] = useState("");
+
+  // 5. Create the submit handler
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!name || !email || !message) {
+      setFormMessage("Please fill out all required fields.");
+      return;
+    }
+
+    setIsLoading(true);
+    setFormMessage("");
+
+    try {
+      // 6. Save the form data to a new "contactSubmissions" collection
+      await addDoc(collection(db, "contactSubmissions"), {
+        name,
+        email,
+        phone,
+        message,
+        submittedAt: serverTimestamp(), // Add a timestamp
+      });
+
+      // 7. Reset form and show success
+      setName("");
+      setEmail("");
+      setPhone("");
+      setMessage("");
+      setFormMessage("Success! Your message has been sent. We'll be in touch soon.");
+
+    } catch (error) {
+      console.error("Error submitting form: ", error);
+      setFormMessage("An error occurred. Please try again later.");
+    }
+
+    setIsLoading(false);
+  };
+
   return (
     <section id="contact" className="py-20 md:py-32 gradient-premium">
       <div className="container mx-auto px-4">
@@ -22,11 +69,15 @@ export const Contact = () => {
             <h3 className="text-2xl font-display font-bold text-foreground mb-6">
               Request a Quote
             </h3>
-            <form className="space-y-4">
+            {/* 8. Add onSubmit to form tag */}
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <Input
                   placeholder="Your Name"
                   className="h-12"
+                  value={name} // 9. Link state to inputs
+                  onChange={(e) => setName(e.target.value)}
+                  required
                 />
               </div>
               <div>
@@ -34,29 +85,51 @@ export const Contact = () => {
                   type="email"
                   placeholder="Email Address"
                   className="h-12"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
               <div>
                 <Input
                   type="tel"
-                  placeholder="Phone Number"
+                  placeholder="Phone Number (Optional)"
                   className="h-12"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
               <div>
                 <Textarea
                   placeholder="Tell us about your project..."
                   className="min-h-32"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
                 />
               </div>
-              <Button variant="hero" size="lg" className="w-full">
-                Submit Inquiry
+              <Button
+                variant="hero"
+                size="lg"
+                className="w-full"
+                type="submit" // 10. Set button type
+                disabled={isLoading} // 11. Disable on loading
+              >
+                {isLoading ? "Sending..." : "Submit Inquiry"}
               </Button>
+
+              {/* 12. Show success or error message */}
+              {formMessage && (
+                <p className={`mt-4 text-center ${formMessage.startsWith("Success") ? "text-green-500" : "text-red-500"}`}>
+                  {formMessage}
+                </p>
+              )}
             </form>
           </div>
 
           {/* Contact Information */}
           <div className="space-y-8 animate-slide-in">
+            {/* ... (This part remains unchanged) ... */}
             <div>
               <h3 className="text-2xl font-display font-bold text-foreground mb-6">
                 Get in Touch
@@ -121,3 +194,4 @@ export const Contact = () => {
     </section>
   );
 };
+

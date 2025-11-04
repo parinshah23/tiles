@@ -1,26 +1,24 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+Secret Keys - THIS IS THE MOST IMPORTANT PART
 
-node_modules
-dist
-dist-ssr
-*.local
+This file contains all your Firebase/Supabase passwords
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.env
 
-/generated/prisma
+Dependencies
+
+These folders can be re-downloaded by running "npm install"
+
+node_modules/
+functions/node_modules/
+
+Build output
+
+dist/
+build/
+
+Firebase
+
+These files are for your local setup only
+
+.firebase/
+firebase-debug.log

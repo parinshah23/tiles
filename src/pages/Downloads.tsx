@@ -1,94 +1,150 @@
-import { Download, FileText, Mail } from "lucide-react";
+import { Download, FileText, Link, Mail } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { db } from "@/firebaseConfig";
+import { collection, getDocs, query, orderBy, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
+
+// Define the shape of a Download item
+type DownloadItem = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  size: string;
+  format: string;
+  downloads: number;
+  date: string;
+  fileUrl: string;
+};
 
 export default function Downloads() {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [allDownloads, setAllDownloads] = useState<DownloadItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  const { user } = useAuth(); // Get user if logged in
 
-  const categories = ["All", "Brochures", "Technical", "Certifications", "Installation Guides"];
+  // --- Modal State ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDownload, setSelectedDownload] = useState<DownloadItem | null>(null);
+  const [formEmail, setFormEmail] = useState("");
+  const [isFormLoading, setIsFormLoading] = useState(false);
+  const [formStatusMessage, setFormStatusMessage] = useState("");
 
-  const downloads = [
-    {
-      title: "Company Brochure 2024",
-      description: "Complete overview of Asian Tiles products and services",
-      category: "Brochures",
-      size: "5.2 MB",
-      format: "PDF",
-      downloads: 1248,
-      date: "March 2024",
-    },
-    {
-      title: "Paver Blocks Catalog",
-      description: "Comprehensive catalog of all paver block varieties",
-      category: "Brochures",
-      size: "8.3 MB",
-      format: "PDF",
-      downloads: 2156,
-      date: "February 2024",
-    },
-    {
-      title: "Technical Specifications",
-      description: "Detailed technical specs for all products",
-      category: "Technical",
-      size: "2.1 MB",
-      format: "PDF",
-      downloads: 892,
-      date: "January 2024",
-    },
-    {
-      title: "BIS Certification",
-      description: "BIS Licensed Certified Manufacturer certificate",
-      category: "Certifications",
-      size: "1.5 MB",
-      format: "PDF",
-      downloads: 645,
-      date: "December 2023",
-    },
-    {
-      title: "Installation Guide - Paver Blocks",
-      description: "Step-by-step installation instructions",
-      category: "Installation Guides",
-      size: "3.8 MB",
-      format: "PDF",
-      downloads: 1534,
-      date: "March 2024",
-    },
-    {
-      title: "Roof Tiles Technical Data",
-      description: "Technical specifications and installation guide for roof tiles",
-      category: "Technical",
-      size: "2.9 MB",
-      format: "PDF",
-      downloads: 423,
-      date: "March 2024",
-    },
-    {
-      title: "U-Drain Installation Manual",
-      description: "Complete installation and maintenance guide for U-Drain systems",
-      category: "Installation Guides",
-      size: "4.2 MB",
-      format: "PDF",
-      downloads: 567,
-      date: "March 2024",
-    },
-    {
-      title: "Product Warranty Information",
-      description: "Warranty terms and conditions for all products",
-      category: "Technical",
-      size: "1.2 MB",
-      format: "PDF",
-      downloads: 734,
-      date: "February 2024",
-    },
-  ];
+  // Pre-fill email if user is logged in
+  useEffect(() => {
+    if (user) {
+      setFormEmail(user.email || "");
+    }
+  }, [user, isModalOpen]);
+
+  // Fetch downloads from Firestore
+  useEffect(() => {
+    const fetchDownloads = async () => {
+      setLoading(true);
+      try {
+        const collectionRef = collection(db, "downloads");
+        // FIX: Remove orderBy to avoid needing a composite index
+        const q = query(collectionRef); 
+        const querySnapshot = await getDocs(q);
+        const list = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as DownloadItem));
+        setAllDownloads(list);
+      } catch (error) {
+        console.error("Failed to fetch downloads:", error);
+      }
+      setLoading(false);
+    };
+    fetchDownloads();
+  }, []);
+
+  const categories = ["All", ...Array.from(new Set(allDownloads.map(d => d.category)))];
 
   const filteredDownloads = activeFilter === "All" 
-    ? downloads 
-    : downloads.filter(d => d.category === activeFilter);
+    ? allDownloads 
+    : allDownloads.filter(d => d.category === activeFilter);
+
+  // Handle "Email to Me"
+  const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!formEmail || !selectedDownload) return;
+
+    setIsFormLoading(true);
+    setFormStatusMessage("");
+
+    try {
+      // Save the email submission to a new collection for lead generation
+      await addDoc(collection(db, "downloadSubmissions"), {
+        email: formEmail,
+        fileName: selectedDownload.title,
+        fileUrl: selectedDownload.fileUrl,
+        submittedAt: serverTimestamp(),
+        userId: user ? user.uid : null,
+      });
+
+      // Here you would ALSO integrate an email service (like Resend)
+      // to actually send the email. For now, we'll just show success.
+      
+      setFormStatusMessage("Success! The download link has been sent to your email.");
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setFormStatusMessage("");
+        setFormEmail(user ? user.email || "" : "");
+      }, 2000);
+
+    } catch (error) {
+      console.error("Error submitting email:", error);
+      setFormStatusMessage("An error occurred. Please try again.");
+    }
+    setIsFormLoading(false);
+  };
 
   return (
     <Layout>
+      {/* --- NEW: Dialog for Email --- */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Email Download</DialogTitle>
+            <DialogDescription>
+              Enter your email to receive a link for <strong>{selectedDownload?.title}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="email-modal">Email Address</Label>
+              <Input id="email-modal" type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} required />
+            </div>
+            {formStatusMessage && (
+                <p className={`text-center ${formStatusMessage.startsWith("Success") ? "text-green-500" : "text-red-500"}`}>
+                  {formStatusMessage}
+                </p>
+            )}
+            <DialogFooter>
+              <Button type="submit" disabled={isFormLoading} className="w-full">
+                {isFormLoading ? "Sending..." : "Send to My Email"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {/* --- END DIALOG --- */}
+
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 bg-gradient-to-br from-primary/10 to-background">
         <div className="container mx-auto px-4">
@@ -128,19 +184,19 @@ export default function Downloads() {
       <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredDownloads.map((item, index) => (
+            {loading ? (
+              <p>Loading downloads...</p>
+            ) : filteredDownloads.map((item) => (
               <div
-                key={index}
+                key={item.id}
                 className="bg-card rounded-2xl shadow-elegant hover:shadow-premium transition-smooth hover:-translate-y-1 overflow-hidden group"
               >
-                {/* Card Header */}
                 <div className="bg-primary/5 p-6 flex items-center justify-center">
                   <div className="w-20 h-20 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-smooth">
                     <FileText className="w-10 h-10 text-primary" />
                   </div>
                 </div>
 
-                {/* Card Content */}
                 <div className="p-6 space-y-4">
                   <div>
                     <h3 className="text-xl font-display font-bold text-foreground mb-2">
@@ -151,7 +207,6 @@ export default function Downloads() {
                     </p>
                   </div>
 
-                  {/* Meta Info */}
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <FileText className="w-4 h-4" />
@@ -161,27 +216,32 @@ export default function Downloads() {
                   </div>
 
                   <div className="flex items-center justify-between text-sm text-muted-foreground pb-4 border-b border-border">
-                    <span>{item.date}</span>
+                    <span>{new Date(item.date).toLocaleDateString()}</span>
                     <span>{item.downloads} downloads</span>
                   </div>
 
                   {/* Actions */}
                   <div className="space-y-2">
-                    <Button variant="default" size="lg" className="w-full group/btn">
-                      <Download className="mr-2 group-hover/btn:translate-y-1 transition-smooth" />
-                      Download
-                    </Button>
-                    <Button variant="outline" size="sm" className="w-full">
-                      <Mail className="mr-2 w-4 h-4" />
-                      Email to Me
-                    </Button>
+                    {/* NEW: Download button is now a direct link */}
+                    <a href={item.fileUrl} target="_blank" rel="noopener noreferrer" download>
+                      <Button variant="default" size="lg" className="w-full group/btn">
+                        <Download className="mr-2 group-hover/btn:translate-y-1 transition-smooth" />
+                        Download
+                      </Button>
+                    </a>
+                    
+                    {/* THIS IS THE FIX:
+                      Removed the <DialogTrigger> wrapper.
+                      The Button now controls the modal by setting state.
+                    */}
+                    
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {filteredDownloads.length === 0 && (
+          {!loading && filteredDownloads.length === 0 && (
             <div className="text-center py-20">
               <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-display font-bold text-foreground mb-2">
@@ -205,13 +265,16 @@ export default function Downloads() {
             <p className="text-lg text-muted-foreground mb-8">
               Can't find what you're looking for? Contact our team for customized documentation and technical support.
             </p>
-            <Button variant="default" size="lg">
-              <Mail className="mr-2" />
-              Contact Support
-            </Button>
+            <Link to="/contact">
+              <Button variant="default" size="lg">
+                <Mail className="mr-2" />
+                Contact Support
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
     </Layout>
   );
 }
+

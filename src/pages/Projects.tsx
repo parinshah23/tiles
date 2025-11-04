@@ -1,92 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Home, Hotel, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import floorTilesImg from "@/assets/floor-tiles.jpg";
-import wallTilesImg from "@/assets/wall-tiles.jpg";
-import marbleGraniteImg from "@/assets/marble-granite.jpg";
-import designerCollectionImg from "@/assets/designer-collection.jpg";
-import heroTilesImg from "@/assets/hero-tiles.jpg";
+// NEW: Import Firebase
+import { db } from "@/firebaseConfig";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
-const projects = [
-  {
-    id: 1,
-    title: "HP Government Infrastructure",
-    client: "HP (Himachal Pradesh Government)",
-    category: "Government",
-    location: "Himachal Pradesh",
-    area: "50,000 sq.ft",
-    year: "2023",
-    image: heroTilesImg,
-    description: "Large-scale government infrastructure project with premium paver blocks and precast products",
-  },
-  {
-    id: 2,
-    title: "BSBK Engineering Complex",
-    client: "BSBK Group",
-    category: "Commercial",
-    location: "Multiple Locations",
-    area: "35,000 sq.ft",
-    year: "2024",
-    image: designerCollectionImg,
-    description: "Engineering projects featuring durable paver blocks and high-quality precast solutions",
-  },
-  {
-    id: 3,
-    title: "Raheja Real Estate Development",
-    client: "Raheja Group",
-    category: "Residential",
-    location: "Delhi NCR",
-    area: "80,000 sq.ft",
-    year: "2023",
-    image: marbleGraniteImg,
-    description: "Premium residential development with contemporary tiles and designer pavers",
-  },
-  {
-    id: 4,
-    title: "Mosh Varaya Urban Spaces",
-    client: "Mosh Varaya",
-    category: "Commercial",
-    location: "Bangalore",
-    area: "45,000 sq.ft",
-    year: "2024",
-    image: wallTilesImg,
-    description: "Modern urban development featuring high-quality tiles and outdoor pavers",
-  },
-  {
-    id: 5,
-    title: "Mor Raipur City Infrastructure",
-    client: "Mor Raipur",
-    category: "Government",
-    location: "Raipur, Chhattisgarh",
-    area: "60,000 sq.ft",
-    year: "2023",
-    image: floorTilesImg,
-    description: "Urban infrastructure enhancement with durable paver blocks and precast products",
-  },
-  {
-    id: 6,
-    title: "Commercial Plaza Development",
-    client: "Private Developer",
-    category: "Commercial",
-    location: "Mumbai, Maharashtra",
-    area: "28,000 sq.ft",
-    year: "2024",
-    image: designerCollectionImg,
-    description: "High-traffic commercial plaza with premium quality paver blocks",
-  },
-];
+// NEW: Define a type for our Project data
+type Project = {
+  id: string;
+  title: string;
+  client: string;
+  category: string;
+  location: string;
+  area: string;
+  year: string;
+  image: string;
+  description: string;
+};
 
 const categories = ["All", "Government", "Commercial", "Residential"];
 
-
-
 const Projects = () => {
+  // NEW: State for projects and loading
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // State for filter (same as before)
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const filteredProjects = projects.filter(
+  // NEW: Fetch projects from Firestore
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setIsLoading(true);
+      try {
+        const projectsCollectionRef = collection(db, "projects");
+        // Optional: Order by year
+        const q = query(projectsCollectionRef, orderBy("year", "desc"));
+        const querySnapshot = await getDocs(q);
+        
+        const projectsList: Project[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Project));
+        
+        setAllProjects(projectsList);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Filter logic (same as before, but uses state)
+  const filteredProjects = allProjects.filter(
     (project) => selectedCategory === "All" || project.category === selectedCategory
   );
 
@@ -103,9 +74,20 @@ const Projects = () => {
     }
   };
 
+  // NEW: Show a loading state
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-40 text-center">
+          <h1 className="text-3xl font-display font-bold text-foreground">Loading Projects...</h1>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      {/* Hero Section */}
+      {/* Hero Section (Unchanged) */}
       <section className="relative bg-gradient-to-br from-primary to-secondary py-20 md:py-32">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center text-primary-foreground animate-fade-in">
@@ -126,7 +108,7 @@ const Projects = () => {
         </div>
       </section>
 
-      {/* Filter Section */}
+      {/* Filter Section (Unchanged) */}
       <section className="py-12 bg-background border-b">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-4">
@@ -148,21 +130,23 @@ const Projects = () => {
       {/* Projects Grid */}
       <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4">
+          {/* UPDATED: Map over filteredProjects from state */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map((project, index) => {
               const CategoryIcon = getCategoryIcon(project.category);
               return (
                 <div
-                  key={project.id}
+                  key={project.id} // Use database ID
                   className="group bg-card rounded-xl overflow-hidden shadow-elegant hover:shadow-premium transition-elegant animate-fade-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <img
-                      src={project.image}
+                      src={project.image} // Use database image URL
                       alt={project.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-elegant"
                     />
+                    {/* ... (rest of the card JSX is the same) ... */}
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-accent text-accent-foreground shadow-glow">
                         {project.category}
@@ -214,7 +198,7 @@ const Projects = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section (Unchanged) */}
       <section className="py-20 md:py-32 gradient-premium">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-6">
@@ -242,3 +226,4 @@ const Projects = () => {
 };
 
 export default Projects;
+

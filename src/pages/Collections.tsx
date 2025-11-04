@@ -1,60 +1,72 @@
-import { Layout } from "@/components/Layout";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { Layout } from "../components/Layout";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
 import { Eye, Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import designerCollectionImg from "@/assets/designer-collection.jpg";
-import marbleGraniteImg from "@/assets/marble-granite.jpg";
-import wallTilesImg from "@/assets/wall-tiles.jpg";
-import floorTilesImg from "@/assets/floor-tiles.jpg";
+// NEW: Import Firebase
+import { db } from "../firebaseConfig";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
-const collections = [
-  {
-    id: 1,
-    name: "Royal Heritage Collection",
-    description: "Timeless elegance with classic patterns inspired by royal palaces",
-    image: marbleGraniteImg,
-    products: 24,
-    priceRange: "₹85-150/sq.ft",
-    badge: "Bestseller",
-  },
-  {
-    id: 2,
-    name: "Contemporary Minimalist",
-    description: "Clean lines and modern aesthetics for contemporary spaces",
-    image: designerCollectionImg,
-    products: 18,
-    priceRange: "₹65-120/sq.ft",
-    badge: "New",
-  },
-  {
-    id: 3,
-    name: "Natural Stone Series",
-    description: "Authentic stone textures bringing nature indoors",
-    image: floorTilesImg,
-    products: 32,
-    priceRange: "₹95-180/sq.ft",
-    badge: "Premium",
-  },
-  {
-    id: 4,
-    name: "Artistic Patterns",
-    description: "Bold geometric and artistic designs for statement walls",
-    image: wallTilesImg,
-    products: 28,
-    priceRange: "₹75-140/sq.ft",
-    badge: null,
-  },
-];
+// NEW: Define a type for our Collection data
+type Collection = {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  products: number;
+  priceRange: string;
+  badge?: string; // Optional field
+};
 
 const Collections = () => {
+  // NEW: State for collections and loading
+  const [allCollections, setAllCollections] = useState<Collection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // NEW: Fetch collections from Firestore
+  useEffect(() => {
+    const fetchCollections = async () => {
+      setIsLoading(true);
+      try {
+        const collectionsRef = collection(db, "collections");
+        // Optional: Order by name
+        const q = query(collectionsRef, orderBy("name", "asc"));
+        const querySnapshot = await getDocs(q);
+        
+        const collectionsList: Collection[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Collection));
+        
+        setAllCollections(collectionsList);
+      } catch (error) {
+        console.error("Error fetching collections:", error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchCollections();
+  }, []);
+
+  // NEW: Show a loading state
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-40 text-center">
+          <h1 className="text-3xl font-display font-bold text-foreground">Loading Collections...</h1>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      {/* Hero Section */}
+      {/* Hero Section (Unchanged) */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={designerCollectionImg}
+            src={allCollections[0]?.image || "https://via.placeholder.com/1600x900"}
             alt="Designer Collections"
             className="w-full h-full object-cover"
           />
@@ -75,15 +87,17 @@ const Collections = () => {
             </p>
           </div>
         </div>
+        {/* ... (your hero JSX) ... */}
       </section>
 
       {/* Collections Grid */}
       <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4">
           <div className="space-y-16">
-            {collections.map((collection, index) => (
+            {/* UPDATED: Map over allCollections from state */}
+            {allCollections.map((collection, index) => (
               <div
-                key={collection.id}
+                key={collection.id} // Use database ID
                 className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center animate-fade-in ${
                   index % 2 === 1 ? "lg:flex-row-reverse" : ""
                 }`}
@@ -94,7 +108,7 @@ const Collections = () => {
                 >
                   <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-premium">
                     <img
-                      src={collection.image}
+                      src={collection.image} // Use database image URL
                       alt={collection.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-elegant"
                     />
@@ -150,7 +164,7 @@ const Collections = () => {
         </div>
       </section>
 
-      {/* Virtual Showroom CTA */}
+      {/* Virtual Showroom CTA (Unchanged) */}
       <section className="py-20 md:py-32 gradient-premium">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -175,42 +189,44 @@ const Collections = () => {
             </div>
           </div>
         </div>
+       {/* ... (your CTA JSX) ... */}
       </section>
 
-      {/* Quality Range Section */}
+      {/* Quality Range Section (Unchanged) */}
       <section className="py-20 md:py-32 bg-card">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
-              Quality Products for <span className="text-accent">Every Project</span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              From residential to commercial applications, find the perfect product range for your needs
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: "Standard Range", desc: "Durable products for everyday applications" },
-              { title: "Premium Range", desc: "Enhanced designs for refined projects" },
-              { title: "Designer Range", desc: "Signature collections for exceptional spaces" },
-            ].map((tier, index) => (
-              <div
-                key={tier.title}
-                className="bg-background rounded-xl p-8 shadow-elegant hover:shadow-premium transition-elegant text-center"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <h3 className="text-2xl font-display font-bold text-foreground mb-2">{tier.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{tier.desc}</p>
-                <Link to="/products">
-                  <Button variant="outline" size="lg" className="mt-6">
-                    Explore Range
-                  </Button>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
+                  <div className="text-center max-w-3xl mx-auto mb-12">
+                    <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
+                      Quality Products for <span className="text-accent">Every Project</span>
+                    </h2>
+                    <p className="text-lg text-muted-foreground">
+                      From residential to commercial applications, find the perfect product range for your needs
+                    </p>
+                  </div>
+        
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {[
+                      { title: "Standard Range", desc: "Durable products for everyday applications" },
+                      { title: "Premium Range", desc: "Enhanced designs for refined projects" },
+                      { title: "Designer Range", desc: "Signature collections for exceptional spaces" },
+                    ].map((tier, index) => (
+                      <div
+                        key={tier.title}
+                        className="bg-background rounded-xl p-8 shadow-elegant hover:shadow-premium transition-elegant text-center"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <h3 className="text-2xl font-display font-bold text-foreground mb-2">{tier.title}</h3>
+                        <p className="text-muted-foreground leading-relaxed">{tier.desc}</p>
+                        <Link to="/products">
+                          <Button variant="outline" size="lg" className="mt-6">
+                            Explore Range
+                          </Button>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+        {/* ... (your Quality Range JSX) ... */}
       </section>
     </Layout>
   );

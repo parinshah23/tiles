@@ -1,104 +1,86 @@
-import { useState } from "react";
-import { Layout } from "@/components/Layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useState, useEffect } from "react";
+import { Layout } from "../components/Layout";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Checkbox } from "../components/ui/checkbox";
 import { Search, SlidersHorizontal, Eye, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
-import floorTilesImg from "@/assets/floor-tiles.jpg";
-import wallTilesImg from "@/assets/wall-tiles.jpg";
-import marbleGraniteImg from "@/assets/marble-granite.jpg";
-import designerCollectionImg from "@/assets/designer-collection.jpg";
+import { Link, useNavigate } from "react-router-dom";
+import { db } from "../firebaseConfig";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { useAuth } from "../hooks/useAuth";
 
-const products = [
-  {
-    id: 1,
-    name: "Classic Paver Blocks",
-    category: "Paver Blocks",
-    price: "₹35/sq.ft",
-    size: "200x100mm",
-    finish: "Natural",
-    image: floorTilesImg,
-  },
-  {
-    id: 2,
-    name: "Interlocking Paver Series",
-    category: "Paver Blocks",
-    price: "₹42/sq.ft",
-    size: "200x100mm",
-    finish: "Matt",
-    image: wallTilesImg,
-  },
-  {
-    id: 3,
-    name: "Premium Precast Wall Panels",
-    category: "Precast Products",
-    price: "₹85/sq.ft",
-    size: "600x600mm",
-    finish: "Natural",
-    image: marbleGraniteImg,
-  },
-  {
-    id: 4,
-    name: "Contemporary Floor Tiles",
-    category: "Contemporary Tiles",
-    price: "₹58/sq.ft",
-    size: "600x600mm",
-    finish: "Polished",
-    image: designerCollectionImg,
-  },
-  {
-    id: 5,
-    name: "Pyramid Design Pavers",
-    category: "Pyramid Design",
-    price: "₹48/sq.ft",
-    size: "300x300mm",
-    finish: "Matt",
-    image: floorTilesImg,
-  },
-  {
-    id: 6,
-    name: "Windoor Precast Frames",
-    category: "Windoor Products",
-    price: "₹120/piece",
-    size: "Various",
-    finish: "Natural",
-    image: wallTilesImg,
-  },
-  {
-    id: 7,
-    name: "Heavy Duty Outdoor Pavers",
-    category: "Outdoor Pavers",
-    price: "₹52/sq.ft",
-    size: "300x300mm",
-    finish: "Natural",
-    image: marbleGraniteImg,
-  },
-  {
-    id: 8,
-    name: "Designer Concrete Pavers",
-    category: "Paver Blocks",
-    price: "₹55/sq.ft",
-    size: "200x100mm",
-    finish: "Polished",
-    image: designerCollectionImg,
-  },
-];
+// Type matches our Firestore document
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  size: string;
+  finish: string;
+  image: string; // <-- FIX: It's a single string, not an array
+  [key: string]: any;
+};
 
+// Static filters
 const categories = ["All", "Paver Blocks", "Precast Products", "Contemporary Tiles", "Pyramid Design", "Windoor Products", "Outdoor Pavers"];
 const finishes = ["Matt", "Glossy", "Polished", "Satin", "Natural"];
 const sizes = ["200x100mm", "300x300mm", "300x600mm", "600x600mm", "800x800mm"];
 
 const Products = () => {
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("featured");
   const [showFilters, setShowFilters] = useState(false);
+  
+  const navigate = useNavigate();
+  const { user, wishlist, addToWishlist, removeFromWishlist } = useAuth();
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const productsCollection = collection(db, "products");
+        const q = query(productsCollection, orderBy("name", "asc"));
+        const querySnapshot = await getDocs(q);
+        
+        const productsList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Product));
+        
+        setAllProducts(productsList);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+      setIsLoading(false);
+    };
+    fetchProducts();
+  }, []);
+
+  const handleWishlistToggle = (e: React.MouseEvent, product: Product) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    
+    const isWishlisted = wishlist.some(item => item.productId === product.id);
+    
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
+  const filteredProducts = allProducts.filter((product) => {
+    const matchesSearch = product?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "All" || product?.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -106,7 +88,8 @@ const Products = () => {
     <Layout>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary to-secondary py-20 md:py-32">
-        <div className="container mx-auto px-4">
+        {/* ... (Your existing Hero JSX) ... */}
+         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center text-primary-foreground animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-display font-bold mb-6">
               Our <span className="text-accent">Product Catalog</span>
@@ -114,8 +97,6 @@ const Products = () => {
             <p className="text-xl text-primary-foreground/90 mb-8">
               BIS Certified paver blocks, tiles, and precast products since 1982
             </p>
-            
-            {/* Search Bar */}
             <div className="max-w-2xl mx-auto relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <Input
@@ -136,10 +117,9 @@ const Products = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <aside className={`lg:w-64 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+             {/* ... (Your existing Filter JSX) ... */}
               <div className="bg-card p-6 rounded-xl shadow-elegant sticky top-24">
                 <h3 className="text-xl font-display font-bold text-foreground mb-4">Filters</h3>
-                
-                {/* Category Filter */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-foreground mb-3">Category</h4>
                   <div className="space-y-2">
@@ -158,8 +138,6 @@ const Products = () => {
                     ))}
                   </div>
                 </div>
-
-                {/* Finish Filter */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-foreground mb-3">Finish</h4>
                   <div className="space-y-2">
@@ -173,8 +151,6 @@ const Products = () => {
                     ))}
                   </div>
                 </div>
-
-                {/* Size Filter */}
                 <div>
                   <h4 className="font-semibold text-foreground mb-3">Size</h4>
                   <div className="space-y-2">
@@ -195,7 +171,8 @@ const Products = () => {
             <div className="flex-1">
               {/* Toolbar */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <div className="flex items-center gap-2">
+                {/* ... (Your existing Toolbar JSX) ... */}
+                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -209,7 +186,6 @@ const Products = () => {
                     Showing {filteredProducts.length} products
                   </p>
                 </div>
-                
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Sort by" />
@@ -224,50 +200,62 @@ const Products = () => {
               </div>
 
               {/* Product Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="group bg-card rounded-xl overflow-hidden shadow-elegant hover:shadow-premium transition-elegant"
-                  >
-                    <div className="relative aspect-square overflow-hidden">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-elegant"
-                      />
-                      <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-smooth">
-                        <button className="w-10 h-10 rounded-full bg-card shadow-elegant flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-smooth">
-                          <Heart className="w-5 h-5" />
-                        </button>
-                        <Link to={`/products/${product.id}`}>
-                          <button className="w-10 h-10 rounded-full bg-card shadow-elegant flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-smooth">
-                            <Eye className="w-5 h-5" />
-                          </button>
-                        </Link>
+              {isLoading ? (
+                <p>Loading products...</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProducts.map((product) => {
+                    const isWishlisted = user && wishlist.some(item => item.productId === product.id);
+                    
+                    return (
+                      <div
+                        key={product.id}
+                        className="group bg-card rounded-xl overflow-hidden shadow-elegant hover:shadow-premium transition-elegant"
+                      >
+                        <div className="relative aspect-square overflow-hidden">
+                          <img
+                            src={product.image} // <-- FIX: Use product.image
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-elegant"
+                            onError={(e) => (e.currentTarget.src = "https://placehold.co/600x600/222/fff?text=Image+Missing")}
+                          />
+                          <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-smooth">
+                            <button 
+                              onClick={(e) => handleWishlistToggle(e, product)}
+                              className={`w-10 h-10 rounded-full bg-card shadow-elegant flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-smooth ${isWishlisted ? "text-accent" : "text-foreground"}`}
+                            >
+                              <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
+                            </button>
+                            <Link to={`/products/${product.id}`}>
+                              <button className="w-10 h-10 rounded-full bg-card shadow-elegant flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-smooth">
+                                <Eye className="w-5 h-5" />
+                              </button>
+                            </Link>
+                          </div>
+                        </div>
+                        <div className="p-5">
+                          <p className="text-sm text-accent font-medium mb-1">{product.category}</p>
+                          <h3 className="text-lg font-display font-bold text-foreground mb-2">
+                            {product.name}
+                          </h3>
+                          <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
+                            <span>{product.size}</span>
+                            <span>{product.finish}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className="text-xl font-bold text-accent">₹{product.price}/sq.ft</p>
+                            <Link to={`/products/${product.id}`}>
+                              <Button variant="premium" size="sm">
+                                View Details
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-5">
-                      <p className="text-sm text-accent font-medium mb-1">{product.category}</p>
-                      <h3 className="text-lg font-display font-bold text-foreground mb-2">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
-                        <span>{product.size}</span>
-                        <span>{product.finish}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-xl font-bold text-accent">{product.price}</p>
-                        <Link to={`/products/${product.id}`}>
-                          <Button variant="premium" size="sm">
-                            View Details
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -277,3 +265,4 @@ const Products = () => {
 };
 
 export default Products;
+

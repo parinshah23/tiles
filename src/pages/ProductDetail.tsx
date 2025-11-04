@@ -1,62 +1,137 @@
-import { useState } from "react";
-import { Layout } from "@/components/Layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { Layout } from "../components/Layout";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Badge } from "../components/ui/badge";
 import { Heart, Share2, Ruler, Package, Award, Truck } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
-import floorTilesImg from "@/assets/floor-tiles.jpg";
-import wallTilesImg from "@/assets/wall-tiles.jpg";
-import marbleGraniteImg from "@/assets/marble-granite.jpg";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { db } from "../firebaseConfig"; // Use relative path
+import { doc, getDoc } from "firebase/firestore";
+import { useAuth } from "../hooks/useAuth";
+
+// Type matches our Firestore document
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  size: string;
+  finish: string;
+  inStock: boolean;
+  image: string; // <-- FIX: It's a single string
+  images: string[]; // <-- It might ALSO have an images array
+  description: string;
+  features: string[];
+  specifications: { [key: string]: string };
+  [key:string]: any;
+};
+
+// Mock related products (can be fetched later)
+const relatedProducts:any[] = [ // Changed to any[] to match usage
+  // { id: 2, name: "Similar Wood Finish", image: "...", price: 48 },
+];
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, wishlist, addToWishlist, removeFromWishlist } = useAuth();
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const product = {
-    id: id,
-    name: "Classic Wood Finish Floor Tile",
-    category: "Floor Tiles",
-    price: 45,
-    size: "600x600mm",
-    finish: "Matt",
-    thickness: "10mm",
-    material: "Porcelain",
-    brand: "Asian Tiles Premium",
-    inStock: true,
-    images: [floorTilesImg, wallTilesImg, marbleGraniteImg],
-    description: "Transform your space with our Classic Wood Finish Floor Tile. This premium porcelain tile combines the natural beauty of wood with the durability and easy maintenance of ceramic. Perfect for both residential and commercial applications.",
-    features: [
-      "Anti-slip surface for safety",
-      "Water resistant and easy to clean",
-      "Suitable for indoor and outdoor use",
-      "Fade resistant colors",
-      "Low maintenance requirements",
-    ],
-    specifications: {
-      "Product Code": "AWT-CF-600",
-      "Size": "600x600mm",
-      "Thickness": "10mm",
-      "Finish": "Matt",
-      "Material": "Porcelain",
-      "Water Absorption": "Less than 0.5%",
-      "Breaking Strength": "1200 N",
-      "Slip Resistance": "R10",
-    },
+  // FIX: Create a state for the gallery images
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!id) return;
+    
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        const productDocRef = doc(db, "products", id);
+        const docSnap = await getDoc(productDocRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const productData = {
+            id: docSnap.id,
+            ...data,
+          } as Product;
+          
+          setProduct(productData);
+
+          // --- FIX FOR IMAGES ---
+          // Check if an 'images' array exists (for old products)
+          if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+            setGalleryImages(data.images);
+          } 
+          // Otherwise, use the single 'image' (for new products)
+          else if (data.image) {
+            setGalleryImages([data.image]);
+          }
+          // --- END FIX ---
+
+        } else {
+          console.error("No such product!");
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  const handleWishlistToggle = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    if (!product) return;
+    
+    const isWishlisted = wishlist.some(item => item.productId === product.id);
+    
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
   };
 
-  const relatedProducts = [
-    { id: 2, name: "Similar Wood Finish", image: wallTilesImg, price: 48 },
-    { id: 3, name: "Marble Pattern Floor", image: marbleGraniteImg, price: 120 },
-    { id: 4, name: "Contemporary Design", image: floorTilesImg, price: 52 },
-  ];
+  const isWishlisted = user && product && wishlist.some(item => item.productId === product.id);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-3xl font-bold">Loading Product...</h1>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!product) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-3xl font-bold">Product Not Found</h1>
+          <Link to="/products">
+            <Button variant="link">Back to Products</Button>
+          </Link>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
       {/* Breadcrumb */}
       <div className="bg-muted py-4">
+        {/* ... (Your existing Breadcrumb JSX) ... */}
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link to="/" className="hover:text-accent">Home</Link>
@@ -76,26 +151,30 @@ const ProductDetail = () => {
             <div className="space-y-4">
               <div className="aspect-square rounded-2xl overflow-hidden shadow-premium">
                 <img
-                  src={product.images[selectedImage]}
+                  src={galleryImages[selectedImage]} // <-- FIX: Use galleryImages state
                   alt={product.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => (e.currentTarget.src = "https://placehold.co/600x600/222/fff?text=Image+Missing")}
                 />
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                {product.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-smooth ${
-                      selectedImage === index
-                        ? "border-accent"
-                        : "border-transparent hover:border-muted"
-                    }`}
-                  >
-                    <img src={image} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
+              {/* Only show gallery if there's more than one image */}
+              {galleryImages.length > 1 && (
+                <div className="grid grid-cols-3 gap-4">
+                  {galleryImages.map((image, index) => ( // <-- FIX: Use galleryImages state
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(index)}
+                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-smooth ${
+                        selectedImage === index
+                          ? "border-accent"
+                          : "border-transparent hover:border-muted"
+                      }`}
+                    >
+                      <img src={image} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Product Info */}
@@ -157,21 +236,27 @@ const ProductDetail = () => {
                       Request Quote
                     </Button>
                   </Link>
-                  <Button variant="outline" size="lg">
-                    <Heart className="w-5 h-5" />
-                  </Button>
-                  <Button variant="outline" size="lg">
-                    <Share2 className="w-5 h-5" />
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    onClick={handleWishlistToggle}
+                    className={isWishlisted ? "text-accent" : ""}
+                  >
+                    <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
                   </Button>
                 </div>
+                
 
+                <Link to="/contact" className="block">
                 <Button variant="outline" size="lg" className="w-full">
                   Request Sample
                 </Button>
+                </Link>
               </div>
 
               {/* Trust Badges */}
               <div className="grid grid-cols-3 gap-4 pt-6 border-t">
+                 {/* ... (Your existing Trust Badges JSX) ... */}
                 <div className="text-center">
                   <Award className="w-8 h-8 text-accent mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">Premium Quality</p>
@@ -200,7 +285,7 @@ const ProductDetail = () => {
               <TabsContent value="features" className="mt-6 bg-card p-8 rounded-xl">
                 <h3 className="text-2xl font-display font-bold text-foreground mb-4">Key Features</h3>
                 <ul className="space-y-3">
-                  {product.features.map((feature, index) => (
+                  {product.features && product.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <div className="w-2 h-2 rounded-full bg-accent mt-2" />
                       <p className="text-foreground">{feature}</p>
@@ -212,7 +297,7 @@ const ProductDetail = () => {
               <TabsContent value="specifications" className="mt-6 bg-card p-8 rounded-xl">
                 <h3 className="text-2xl font-display font-bold text-foreground mb-4">Technical Specifications</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(product.specifications).map(([key, value]) => (
+                  {product.specifications && Object.entries(product.specifications).map(([key, value]) => (
                     <div key={key} className="flex justify-between py-3 border-b border-border">
                       <span className="text-muted-foreground">{key}</span>
                       <span className="font-semibold text-foreground">{value}</span>
@@ -268,3 +353,4 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+

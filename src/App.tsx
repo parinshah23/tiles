@@ -1,45 +1,62 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./hooks/useAuth";
+
+// Import all your pages
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Collections from "./pages/Collections";
-import AboutPage from "./pages/AboutPage";
 import Projects from "./pages/Projects";
-import ContactPage from "./pages/ContactPage";
-import NotFound from "./pages/NotFound";
-import RoofTiles from "./pages/RoofTiles";
-import UDrain from "./pages/UDrain";
+import AboutPage from "./pages/AboutPage";
 import Downloads from "./pages/Downloads";
+import ContactPage from "./pages/ContactPage";
+import RoofTiles from "./pages/RoofTiles";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import NotFound from "./pages/NotFound";
+import AdminPage from "./pages/AdminPage";
+import WishlistPage from "./pages/WishlistPage"; // <-- 1. IMPORT WISHLIST PAGE
 
-const queryClient = new QueryClient();
+// Import the guard components
+import AdminRoute from "./components/AdminRoute";
+import AuthRoute from "./components/AuthRoute"; // <-- 2. IMPORT AUTH GUARD
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
+function App() {
+  return (
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/collections" element={<Collections />} />
-          <Route path="/about" element={<AboutPage />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/downloads" element={<Downloads />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/roof-tiles" element={<RoofTiles />} />
-          <Route path="/u-drain" element={<UDrain />} />
-          <Route path="/downloads" element={<Downloads />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* 3. ADD THE PROTECTED USER ROUTE */}
+          <Route element={<AuthRoute />}>
+            <Route path="/wishlist" element={<WishlistPage />} />
+            {/* You can add more user-only pages here, like /profile */}
+          </Route>
+
+          {/* Protected Admin Route */}
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminPage />} />
+          </Route>
+
+          {/* 404 Page */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+    </AuthProvider>
+  );
+}
 
 export default App;
+
