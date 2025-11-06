@@ -184,16 +184,6 @@ const ProductDetail = () => {
                 <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
                   {product.name}
                 </h1>
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="text-4xl font-bold text-accent">
-                    ₹{product.price}<span className="text-lg text-muted-foreground">/sq.ft</span>
-                  </div>
-                  {product.inStock && (
-                    <Badge variant="outline" className="text-green-600 border-green-600">
-                      In Stock
-                    </Badge>
-                  )}
-                </div>
                 <p className="text-muted-foreground leading-relaxed">{product.description}</p>
               </div>
 
@@ -202,15 +192,29 @@ const ProductDetail = () => {
                 <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
                   <Ruler className="w-5 h-5 text-accent" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Size</p>
-                    <p className="font-semibold">{product.size}</p>
+                    <p className="text-sm text-muted-foreground">Dimensions</p>
+                    <p className="font-semibold">{product.dimensions}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
+                  <Ruler className="w-5 h-5 text-accent" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Area</p>
+                    <p className="font-semibold">{product.area}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
+                  <Ruler className="w-5 h-5 text-accent" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Thickness</p>
+                    <p className="font-semibold">{product.thickness}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
                   <Package className="w-5 h-5 text-accent" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Finish</p>
-                    <p className="font-semibold">{product.finish}</p>
+                    <p className="text-sm text-muted-foreground">Coverage per sq.ft</p>
+                    <p className="font-semibold">{product.coverage}</p>
                   </div>
                 </div>
               </div>
@@ -274,7 +278,7 @@ const ProductDetail = () => {
           </div>
 
           {/* Tabs Section */}
-          <div className="mt-16">
+          {/* <div className="mt-16">
             <Tabs defaultValue="features" className="w-full">
               <TabsList className="w-full justify-start">
                 <TabsTrigger value="features">Features</TabsTrigger>
@@ -319,10 +323,10 @@ const ProductDetail = () => {
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
+          </div> */}
 
           {/* Related Products */}
-          <div className="mt-16">
+          {/* <div className="mt-16">
             <h2 className="text-3xl font-display font-bold text-foreground mb-8">Related Products</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedProducts.map((item) => (
@@ -345,7 +349,7 @@ const ProductDetail = () => {
                 </Link>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
     </Layout>
