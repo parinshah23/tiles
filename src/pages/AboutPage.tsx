@@ -14,7 +14,7 @@ const stats = [
 
 const timeline = [
   { year: "1982", title: "Foundation", desc: "Asian Tiles established as paver blocks manufacturer" },
-  { year: "1995", title: "BIS Certification", desc: "Received BIS Licensed Certification for quality assurance" },
+  { year: "1995", title: "ISI Certification", desc: "Received ISI Licensed Certification for quality assurance" },
   { year: "2010", title: "Expansion", desc: "Launched comprehensive precast products line" },
   { year: "2024", title: "Digital Era", desc: "180+ clients and growing with digital presence" },
 ];
@@ -24,7 +24,7 @@ const asianValues = [
     letter: "A",
     value: "Assured Quality",
     title: "Assured Quality",
-    description: "BIS Licensed Certified products that meet the highest industry standards",
+    description: "ISI Licensed Certified products that meet the highest industry standards",
   },
   {
     letter: "S",
@@ -40,9 +40,9 @@ const asianValues = [
   },
   {
     letter: "A",
-    value: "Always Respect Others",
-    title: "Always Respect Others",
-    description: "Treating every stakeholder with dignity and professionalism",
+    value: "Always take Data-Based Decisions",
+    title: "Always take Data-Based Decisions",
+    description: "Integrating Insights for Better Problem Solving",
   },
   {
     letter: "N",
@@ -202,40 +202,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Timeline Section */}
-      <section className="py-20 md:py-32 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
-              Our <span className="text-accent">Journey</span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Milestones that shaped Asian Tiles into a trusted name
-            </p>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-8">
-              {timeline.map((item, index) => (
-                <div
-                  key={item.year}
-                  className="flex gap-8 items-start animate-slide-in"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="flex-shrink-0 w-24">
-                    <div className="text-3xl font-display font-bold text-accent">{item.year}</div>
-                  </div>
-                  <div className="relative flex-1 pb-8 border-l-2 border-border pl-8">
-                    <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-accent" />
-                    <h3 className="text-2xl font-display font-bold text-foreground mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       <WhyChooseUs />
 
@@ -268,38 +234,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Team/Culture Section */}
-      <section className="py-20 md:py-32 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-premium">
-              <img
-                src={designerCollectionImg}
-                alt="Our team"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-5xl font-display font-bold">
-                Craftsmanship Meets <span className="text-accent">Excellence</span>
-              </h2>
-              <p className="text-xl text-primary-foreground/90 leading-relaxed">
-                Since 1982, our team has been dedicated to manufacturing BIS certified paver blocks and precast products. Every project reflects our commitment to quality, durability, and customer satisfaction.
-              </p>
-              <div className="grid grid-cols-2 gap-6 pt-6">
-                <div>
-                  <p className="text-4xl font-display font-bold text-accent mb-2">BIS</p>
-                  <p className="text-primary-foreground/80">Licensed Certified</p>
-                </div>
-                <div>
-                  <p className="text-4xl font-display font-bold text-accent mb-2">180+</p>
-                  <p className="text-primary-foreground/80">Trusted Clients</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+
     </Layout>
   );
 };

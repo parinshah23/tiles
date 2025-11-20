@@ -8,7 +8,7 @@ const features = [
   },
   {
     icon: Award,
-    title: "BIS Licensed Certified Manufacturer",
+    title: "ISI Licensed Certified Manufacturer",
     description: "Government certified quality assurance for all our products",
   },
   {
@@ -18,7 +18,7 @@ const features = [
   },
   {
     icon: CheckCircle2,
-    title: "Affordable Luxury Without Compromising",
+    title: "Affordable Quality Without Compromising",
     description: "Premium quality products at competitive prices",
   },
   {
@@ -50,12 +50,12 @@ export const WhyChooseUs = () => {
             >
               {/* Background Accent */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-smooth" />
-              
+
               {/* Icon with Glow */}
               <div className="relative w-16 h-16 rounded-2xl bg-gradient-accent flex items-center justify-center mb-6 shadow-glow group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                 <feature.icon className="w-8 h-8 text-accent-foreground" />
               </div>
-              
+
               {/* Content */}
               <h3 className="text-xl font-display font-bold text-foreground mb-3 group-hover:text-accent transition-smooth">
                 {feature.title}
@@ -63,7 +63,7 @@ export const WhyChooseUs = () => {
               <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
-              
+
               {/* Bottom Accent Line */}
               <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
             </div>

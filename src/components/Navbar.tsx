@@ -12,9 +12,9 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // 1. Get user AND wishlist from our hook
-  const { user, wishlist } = useAuth(); 
+  const { user, wishlist } = useAuth();
 
   // 2. Get the number of items
   const wishlistItemCount = wishlist ? wishlist.length : 0;
@@ -34,7 +34,7 @@ export const Navbar = () => {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products" },
-    { name: "Collections", href: "/collections" },
+
     { name: "Projects", href: "/projects" },
     { name: "About", href: "/about" },
     { name: "Downloads", href: "/downloads" },
@@ -57,11 +57,10 @@ export const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
           ? "bg-card/95 backdrop-blur-xl shadow-elegant border-b border-border/50"
           : "bg-primary/40 backdrop-blur-md"
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
@@ -80,19 +79,17 @@ export const Navbar = () => {
               <Link
                 key={link.name}
                 to={link.href}
-                className={`relative px-4 py-2 hover:text-accent transition-smooth font-medium group ${
-                  isActive(link.href)
+                className={`relative px-4 py-2 hover:text-accent transition-smooth font-medium group ${isActive(link.href)
                     ? "text-accent"
                     : isScrolled
-                    ? "text-foreground"
-                    : "text-primary-foreground"
-                }`}
+                      ? "text-foreground"
+                      : "text-primary-foreground"
+                  }`}
               >
                 {link.name}
                 <span
-                  className={`absolute bottom-0 left-0 w-full h-0.5 bg-accent transform origin-left transition-transform duration-300 ${
-                    isActive(link.href) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                  }`}
+                  className={`absolute bottom-0 left-0 w-full h-0.5 bg-accent transform origin-left transition-transform duration-300 ${isActive(link.href) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    }`}
                 />
               </Link>
             ))}
@@ -107,11 +104,10 @@ export const Navbar = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className={`relative ${
-                      isScrolled
+                    className={`relative ${isScrolled
                         ? "text-foreground hover:text-accent"
                         : "text-primary-foreground hover:text-accent"
-                    }`}
+                      }`}
                   >
                     <Heart />
                     {wishlistItemCount > 0 && (
@@ -156,9 +152,8 @@ export const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className={`md:hidden ${
-              isScrolled ? "text-foreground" : "text-primary-foreground"
-            }`}
+            className={`md:hidden ${isScrolled ? "text-foreground" : "text-primary-foreground"
+              }`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -173,9 +168,8 @@ export const Navbar = () => {
                 <Link
                   key={link.name}
                   to={link.href}
-                  className={`text-foreground hover:text-accent transition-smooth font-medium py-2 ${
-                    isActive(link.href) ? "text-accent" : ""
-                  }`}
+                  className={`text-foreground hover:text-accent transition-smooth font-medium py-2 ${isActive(link.href) ? "text-accent" : ""
+                    }`}
                 >
                   {link.name}
                 </Link>

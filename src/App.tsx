@@ -5,7 +5,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
-import Collections from "./pages/Collections";
+
 import Projects from "./pages/Projects";
 import AboutPage from "./pages/AboutPage";
 import Downloads from "./pages/Downloads";
@@ -30,7 +30,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="/collections" element={<Collections />} />
+
           <Route path="/projects" element={<Projects />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/downloads" element={<Downloads />} />

@@ -101,7 +101,7 @@ const Products = () => {
               Our <span className="text-accent">Product Catalog</span>
             </h1>
             <p className="text-xl text-primary-foreground/90 mb-8">
-              BIS Certified paver blocks, tiles, and precast products since 1982
+              ISI Certified paver blocks, tiles, and precast products since 1982
             </p>
             <div className="max-w-2xl mx-auto relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
@@ -134,11 +134,10 @@ const Products = () => {
                       <button
                         key={category}
                         onClick={() => setSelectedCategory(category)}
-                        className={`w-full text-left px-3 py-2 rounded-md transition-smooth ${
-                          selectedCategory === category
+                        className={`w-full text-left px-3 py-2 rounded-md transition-smooth ${selectedCategory === category
                             ? "bg-accent text-accent-foreground"
                             : "hover:bg-muted"
-                        }`}
+                          }`}
                       >
                         {category}
                       </button>
@@ -200,16 +199,15 @@ const Products = () => {
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-elegant"
                             onError={(e) =>
-                              (e.currentTarget.src =
-                                "https://placehold.co/600x600/222/fff?text=Image+Missing")
+                            (e.currentTarget.src =
+                              "https://placehold.co/600x600/222/fff?text=Image+Missing")
                             }
                           />
                           <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-smooth">
                             <button
                               onClick={(e) => handleWishlistToggle(e, product)}
-                              className={`w-10 h-10 rounded-full bg-card shadow-elegant flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-smooth ${
-                                isWishlisted ? "text-accent" : "text-foreground"
-                              }`}
+                              className={`w-10 h-10 rounded-full bg-card shadow-elegant flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-smooth ${isWishlisted ? "text-accent" : "text-foreground"
+                                }`}
                             >
                               <Heart
                                 className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`}

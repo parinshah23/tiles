@@ -12,7 +12,7 @@ export const Footer = () => {
           <div>
             <h3 className="text-2xl font-display font-bold mb-4">Asian Tiles</h3>
             <p className="text-primary-foreground/80 leading-relaxed mb-4">
-              Most Trusted Paver Blocks & Precast Products Manufacturer since 1982. BIS Licensed Certified. Built to last and designed to inspire.
+              Most Trusted Paver Blocks & Precast Products Manufacturer since 1982. ISI Licensed Certified. Built to last and designed to inspire.
             </p>
             <div className="space-y-2 text-primary-foreground/80 mb-4">
               <p className="flex items-center gap-2 text-sm">
@@ -43,7 +43,7 @@ export const Footer = () => {
               {[
                 { name: "Home", path: "/" },
                 { name: "Products", path: "/products" },
-                { name: "Collections", path: "/collections" },
+
                 { name: "About Us", path: "/about" },
                 { name: "Downloads", path: "/downloads" },
                 { name: "Contact", path: "/contact" },
@@ -118,6 +118,14 @@ export const Footer = () => {
               <a href="#" className="text-primary-foreground/70 hover:text-accent transition-smooth">
                 Terms of Service
               </a>
+              <div className="flex items-center gap-2 ml-4 border-l border-primary-foreground/20 pl-4">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/ISI_mark.svg/1200px-ISI_mark.svg.png"
+                  alt="ISI Certified"
+                  className="h-8 w-auto opacity-80 hover:opacity-100 transition-smooth bg-white rounded-sm p-0.5"
+                />
+                <span className="text-xs text-primary-foreground/70">ISI Certified</span>
+              </div>
             </div>
           </div>
         </div>

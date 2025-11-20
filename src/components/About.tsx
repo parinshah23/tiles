@@ -29,7 +29,7 @@ export const About = () => {
               <span className="text-accent">Exceptional Tiles and Pavers</span>
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              We believe that true quality is reflected in every detail, and style is what sets your space apart. 
+              We believe that true quality is reflected in every detail, and style is what sets your space apart.
               Our tiles and pavers are crafted with precision, ensuring that both beauty and durability come together seamlessly.
             </p>
 
@@ -43,9 +43,9 @@ export const About = () => {
             <div className="space-y-4">
               {[
                 "Serving Beyond Expectation since 1982",
-                "BIS Licensed Certified Manufacturer",
+                "ISI Licensed Certified Manufacturer",
                 "Diverse Range of Designs",
-                "Affordable Luxury Without Compromising",
+                "Affordable Quality Without Compromising",
                 "Secure, Satisfaction Guaranteed",
               ].map((point, index) => (
                 <div key={index} className="flex items-start gap-3">

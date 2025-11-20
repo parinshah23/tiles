@@ -65,7 +65,7 @@ const ManageCollections = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
@@ -96,7 +96,7 @@ const ManageCollections = () => {
       const { data: urlData } = supabase.storage
         .from("asian-tiles-assets")
         .getPublicUrl(fileName);
-      
+
       const imageUrl = urlData.publicUrl;
 
       // 3. Prepare data for Firestore
@@ -151,17 +151,17 @@ const ManageCollections = () => {
               <Label htmlFor="name">Collection Name</Label>
               <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
             </div>
-            
+
             <div>
               <Label htmlFor="image">Collection Image</Label>
               <Input id="image" type="file" onChange={handleFileChange} accept="image/*" required />
             </div>
-            
+
             <div>
               <Label htmlFor="description">Description</Label>
               <Textarea id="description" name="description" value={formData.description} onChange={handleChange} />
             </div>
-            
+
             <div>
               <Label htmlFor="products">No. of Products</Label>
               <Input id="products" name="products" type="number" value={formData.products} onChange={handleChange} />
@@ -176,7 +176,7 @@ const ManageCollections = () => {
               <Label htmlFor="badge">Badge (optional)</Label>
               <Input id="badge" name="badge" placeholder="e.g. Bestseller" value={formData.badge} onChange={handleChange} />
             </div>
-            
+
             {error && <p className="text-red-500 text-sm">{error}</p>}
 
             <Button type="submit" className="w-full" disabled={uploading}>
