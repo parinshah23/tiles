@@ -52,146 +52,162 @@ export const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-20 md:py-32 gradient-premium">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16 animate-fade-in">
-          <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
-            Start Your <span className="text-accent">Dream Project</span>
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Get in touch with our experts to discuss your requirements
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          {/* Contact Form */}
-          <div className="bg-card rounded-2xl p-8 shadow-premium animate-fade-in">
-            <h3 className="text-2xl font-display font-bold text-foreground mb-6">
-              Request a Quote
-            </h3>
-            {/* 8. Add onSubmit to form tag */}
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <Input
-                  placeholder="Your Name"
-                  className="h-12"
-                  value={name} // 9. Link state to inputs
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Input
-                  type="email"
-                  placeholder="Email Address"
-                  className="h-12"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Input
-                  type="tel"
-                  placeholder="Phone Number (Optional)"
-                  className="h-12"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-              <div>
-                <Textarea
-                  placeholder="Tell us about your project..."
-                  className="min-h-32"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  required
-                />
-              </div>
-              <Button
-                variant="hero"
-                size="lg"
-                className="w-full"
-                type="submit" // 10. Set button type
-                disabled={isLoading} // 11. Disable on loading
-              >
-                {isLoading ? "Sending..." : "Submit Inquiry"}
-              </Button>
-
-              {/* 12. Show success or error message */}
-              {formMessage && (
-                <p className={`mt-4 text-center ${formMessage.startsWith("Success") ? "text-green-500" : "text-red-500"}`}>
-                  {formMessage}
-                </p>
-              )}
-            </form>
+    <>
+      <section id="contact" className="py-20 md:py-32 gradient-premium">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16 animate-fade-in">
+            <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
+              Start Your <span className="text-accent">Dream Project</span>
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Get in touch with our experts to discuss your requirements
+            </p>
           </div>
 
-          {/* Contact Information */}
-          <div className="space-y-8 animate-slide-in">
-            {/* ... (This part remains unchanged) ... */}
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            {/* Contact Form */}
+            <div className="bg-card rounded-2xl p-8 shadow-premium animate-fade-in">
               <h3 className="text-2xl font-display font-bold text-foreground mb-6">
-                Get in Touch
+                Request a Quote
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Visit our showroom or reach out to us through any of the channels below. Our team is ready to help you transform your space.
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              {/* Phone */}
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-6 h-6 text-accent" />
+              {/* 8. Add onSubmit to form tag */}
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <Input
+                    placeholder="Your Name"
+                    className="h-12"
+                    value={name} // 9. Link state to inputs
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground mb-1">Phone</p>
-                  <p className="text-muted-foreground">+91 98932 58000</p>
-                  <p className="text-muted-foreground">+91 97553 84111</p>
-                </div>
-              </div>
-
-              {/* Email */}
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-6 h-6 text-accent" />
+                  <Input
+                    type="email"
+                    placeholder="Email Address"
+                    className="h-12"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground mb-1">Email</p>
-                  <p className="text-muted-foreground">info@asiantiles.in</p>
-                  <p className="text-muted-foreground">sales@asiantiles.in</p>
-                </div>
-              </div>
-
-              {/* Address */}
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-6 h-6 text-accent" />
+                  <Input
+                    type="tel"
+                    placeholder="Phone Number (Optional)"
+                    className="h-12"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground mb-1">Showroom</p>
-                  <p className="text-muted-foreground">
-                    123, Tile Market Complex<br />
-                    Main Road, City Center<br />
-                    Mumbai - 400001
+                  <Textarea
+                    placeholder="Tell us about your project..."
+                    className="min-h-32"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button
+                  variant="hero"
+                  size="lg"
+                  className="w-full"
+                  type="submit" // 10. Set button type
+                  disabled={isLoading} // 11. Disable on loading
+                >
+                  {isLoading ? "Sending..." : "Submit Inquiry"}
+                </Button>
+
+                {/* 12. Show success or error message */}
+                {formMessage && (
+                  <p className={`mt-4 text-center ${formMessage.startsWith("Success") ? "text-green-500" : "text-red-500"}`}>
+                    {formMessage}
                   </p>
-                </div>
-              </div>
+                )}
+              </form>
             </div>
 
-            {/* Business Hours */}
-            <div className="bg-card rounded-xl p-6 shadow-elegant">
-              <p className="font-semibold text-foreground mb-3">Business Hours</p>
-              <div className="space-y-2 text-muted-foreground">
-                <p>Monday - Saturday: 10:00 AM - 7:00 PM</p>
-                <p>Sunday: 11:00 AM - 5:00 PM</p>
+            {/* Contact Information */}
+            <div className="space-y-8 animate-slide-in">
+              {/* ... (This part remains unchanged) ... */}
+              <div>
+                <h3 className="text-2xl font-display font-bold text-foreground mb-6">
+                  Get in Touch
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Visit our showroom or reach out to us through any of the channels below. Our team is ready to help you transform your space.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {/* Phone */}
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground mb-1">Phone</p>
+                    <p className="text-muted-foreground">+91 98932 58000</p>
+                    <p className="text-muted-foreground">+91 97553 84111</p>
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground mb-1">Email</p>
+                    <p className="text-muted-foreground">info@asiantiles.in</p>
+                    <p className="text-muted-foreground">sales@asiantiles.in</p>
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground mb-1">Factory & Office</p>
+                    <p className="text-muted-foreground">
+                      Asian Precast Pvt. Ltd.<br />
+                      FV2G+3P, Raikheda<br />
+                      Chhattisgarh - 493225
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Business Hours */}
+              <div className="bg-card rounded-xl p-6 shadow-elegant">
+                <p className="font-semibold text-foreground mb-3">Business Hours</p>
+                <div className="space-y-2 text-muted-foreground">
+                  <p>Monday - Saturday: 10:00 AM - 7:00 PM</p>
+                  {/* <p>Sunday: 11:00 AM - 5:00 PM</p> */}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Google Maps Integration */}
+      <section className="w-full h-[450px] bg-card">
+        <iframe
+          src="https://maps.google.com/maps?ll=21.450156,81.876847&z=16&t=m&hl=en&gl=IN&mapclient=embed&cid=10236685948962844653&output=embed"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Asian Tiles Location"
+        />
+      </section>
+    </>
   );
 };
 
