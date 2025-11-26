@@ -4,6 +4,8 @@ import { WhyChooseUs } from "@/components/WhyChooseUs";
 import { Award, Users, Building2, Globe } from "lucide-react";
 import marbleGraniteImg from "@/assets/marble-granite.jpg";
 import designerCollectionImg from "@/assets/designer-collection.jpg";
+import founderImg from "@/assets/founder.jpg";
+import managingDirectorImg from "@/assets/managing-director.jpg";
 
 const stats = [
   { icon: Award, value: "40+", label: "Years Experience" },
@@ -152,8 +154,12 @@ const AboutPage = () => {
             <div className="bg-card rounded-2xl shadow-premium overflow-hidden">
               <div className="aspect-square bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-32 h-32 rounded-full bg-accent/20 border-4 border-accent mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-4xl font-display font-bold text-accent">RM</span>
+                  <div className="w-40 h-52 md:w-56 md:h-72 rounded-2xl border-4 border-accent mx-auto mb-4 overflow-hidden bg-accent/10">
+                    <img
+                      src={founderImg}
+                      alt="Shri Ram Das Makhija - Founder of Asian Tiles"
+                      className="w-full h-full object-cover object-top"
+                    />
                   </div>
                   <p className="text-muted-foreground">In Loving Memory</p>
                 </div>
@@ -176,10 +182,14 @@ const AboutPage = () => {
             <div className="bg-card rounded-2xl shadow-premium overflow-hidden">
               <div className="aspect-square bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-32 h-32 rounded-full bg-accent/20 border-4 border-accent mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-4xl font-display font-bold text-accent">MD</span>
+                  <div className="w-40 h-52 md:w-56 md:h-72 rounded-2xl border-4 border-accent mx-auto mb-4 overflow-hidden bg-accent/10">
+                    <img
+                      src={managingDirectorImg}
+                      alt="Managing Director - Asian Tiles"
+                      className="w-full h-full object-cover object-top"
+                    />
                   </div>
-                  <p className="text-muted-foreground">Photo Coming Soon</p>
+                  <p className="text-muted-foreground">Managing Director</p>
                 </div>
               </div>
               <div className="p-8">
