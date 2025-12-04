@@ -65,11 +65,14 @@ export const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center group">
+          <Link to="/" className="flex items-center group" aria-label="Asian Tiles Home">
             <img
               src={asianTilesLogo}
               alt="Asian Tiles - Built to last and designed to inspire"
               className="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition-smooth"
+              loading="eager"
+              width="120"
+              height="64"
             />
           </Link>
 
@@ -100,7 +103,7 @@ export const Navbar = () => {
             {user ? (
               <>
                 {/* 3. ADDED WISHLIST COUNTER TO DESKTOP */}
-                <Link to="/wishlist">
+                <Link to="/wishlist" aria-label={`Wishlist${wishlistItemCount > 0 ? ` (${wishlistItemCount} items)` : ""}`}>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -108,10 +111,11 @@ export const Navbar = () => {
                         ? "text-foreground hover:text-accent"
                         : "text-primary-foreground hover:text-accent"
                       }`}
+                    aria-label={`Wishlist${wishlistItemCount > 0 ? ` (${wishlistItemCount} items)` : ""}`}
                   >
-                    <Heart />
+                    <Heart aria-hidden="true" />
                     {wishlistItemCount > 0 && (
-                      <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                      <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white" aria-hidden="true">
                         {wishlistItemCount}
                       </span>
                     )}
@@ -152,9 +156,11 @@ export const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className={`md:hidden ${isScrolled ? "text-foreground" : "text-primary-foreground"
+            className={`md:hidden touch-target p-2 ${isScrolled ? "text-foreground" : "text-primary-foreground"
               }`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

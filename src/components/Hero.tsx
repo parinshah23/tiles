@@ -5,13 +5,15 @@ import heroImage from "@/assets/hero-tiles.jpg";
 
 export const Hero = () => {
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative min-h-[60vh] md:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Parallax Effect */}
       <div className="absolute inset-0">
         <img
           src={heroImage}
           alt="Premium paver blocks and precast products showcase"
           className="w-full h-full object-cover scale-105 animate-[scale_20s_ease-in-out_infinite] brightness-75"
+          loading="eager"
+          decoding="async"
         />
         <div className="absolute inset-0 gradient-hero" />
 

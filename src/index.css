@@ -121,12 +121,96 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  :root {
+    /* Responsive Typography System - Fluid Typography using clamp() */
+    --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+    --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+    --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+    --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+    --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+    --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+    --font-size-3xl: clamp(2rem, 1.6rem + 2vw, 3rem);
+    --font-size-4xl: clamp(2.5rem, 2rem + 2.5vw, 4rem);
+    
+    /* Line Heights */
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+    
+    /* Letter Spacing */
+    --letter-spacing-tight: -0.02em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.05em;
+    
+    /* Container Max Widths */
+    --container-xs: 320px;
+    --container-sm: 540px;
+    --container-md: 720px;
+    --container-lg: 960px;
+    --container-xl: 1140px;
+    --container-2xl: 1320px;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+  }
+  
+  h1 {
+    font-size: var(--font-size-4xl);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+  }
+  
+  h2 {
+    font-size: var(--font-size-3xl);
+    line-height: var(--line-height-tight);
+  }
+  
+  h3 {
+    font-size: var(--font-size-2xl);
+    line-height: var(--line-height-normal);
+  }
+  
+  h4 {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-normal);
+  }
+  
+  h5 {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-normal);
+  }
+  
+  h6 {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-semibold;
+  }
+  
+  p {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: 1rem;
+  }
+  
+  /* Mobile-specific adjustments */
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px;
+    }
+    
+    h1 {
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      margin-bottom: 0.75rem;
+    }
   }
 }
 
@@ -226,6 +310,63 @@ All colors MUST be HSL.
   
   .hover-glow {
     @apply transition-smooth hover:shadow-glow;
+  }
+  
+  /* Mobile-First Responsive Utilities */
+  .container-responsive {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  
+  @media (min-width: 576px) {
+    .container-responsive {
+      max-width: 540px;
+      padding-right: 20px;
+      padding-left: 20px;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .container-responsive {
+      max-width: 720px;
+      padding-right: 24px;
+      padding-left: 24px;
+    }
+  }
+  
+  @media (min-width: 992px) {
+    .container-responsive {
+      max-width: 960px;
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .container-responsive {
+      max-width: 1140px;
+    }
+  }
+  
+  @media (min-width: 1400px) {
+    .container-responsive {
+      max-width: 1320px;
+    }
+  }
+  
+  /* Touch Target Optimization - Minimum 44x44px for mobile */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Mobile-specific button sizes */
+  @media (max-width: 768px) {
+    .btn-mobile {
+      min-height: 48px;
+      width: 100%;
+    }
   }
 }
 

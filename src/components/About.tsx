@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
+import { LazyImage } from "@/components/LazyImage";
 import marbleGraniteImg from "@/assets/marble-granite.jpg";
 
 export const About = () => {
@@ -10,7 +11,7 @@ export const About = () => {
           {/* Image */}
           <div className="relative animate-fade-in">
             <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-premium">
-              <img
+              <LazyImage
                 src={marbleGraniteImg}
                 alt="Premium marble and granite showcase"
                 className="w-full h-full object-cover"
