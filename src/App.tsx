@@ -20,7 +20,7 @@ const RoofTiles = lazy(() => import("./pages/RoofTiles"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
-const WishlistPage = lazy(() => import("./pages/WishlistPage"));
+
 
 // Loading component
 const PageLoader = () => (
@@ -51,107 +51,97 @@ function App() {
           }}
         >
           <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/products"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <Products />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/products/:id"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <ProductDetail />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/projects"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <Projects />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <AboutPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/downloads"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <Downloads />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/contact"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <ContactPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/roof-tiles"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <RoofTiles />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <LoginPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <RegisterPage />
-              </Suspense>
-            }
-          />
-
-          {/* Protected User Route */}
-          <Route element={<AuthRoute />}>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
             <Route
-              path="/wishlist"
+              path="/products"
               element={
                 <Suspense fallback={<PageLoader />}>
-                  <WishlistPage />
+                  <Products />
                 </Suspense>
               }
             />
-          </Route>
-
-          {/* Protected Admin Route */}
-          <Route element={<AdminRoute />}>
             <Route
-              path="/admin"
+              path="/products/:id"
               element={
                 <Suspense fallback={<PageLoader />}>
-                  <AdminPage />
+                  <ProductDetail />
                 </Suspense>
               }
             />
-          </Route>
+            <Route
+              path="/projects"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <Projects />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <AboutPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/downloads"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <Downloads />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/contact"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <ContactPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/roof-tiles"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <RoofTiles />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <LoginPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <RegisterPage />
+                </Suspense>
+              }
+            />
 
-          {/* 404 Page */}
-          <Route path="*" element={<NotFound />} />
+
+
+            {/* Protected Admin Route */}
+            <Route element={<AdminRoute />}>
+              <Route
+                path="/admin"
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <AdminPage />
+                  </Suspense>
+                }
+              />
+            </Route>
+
+            {/* 404 Page */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

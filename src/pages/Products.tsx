@@ -33,7 +33,7 @@ const Products = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const navigate = useNavigate();
-  const { user, wishlist, addToWishlist, removeFromWishlist } = useAuth();
+  const { user } = useAuth();
 
   // ✅ Fetch products and categories dynamically
   useEffect(() => {
@@ -65,31 +65,25 @@ const Products = () => {
     fetchProductsAndCategories();
   }, []);
 
-  // ✅ Wishlist handling
-  const handleWishlistToggle = (e: React.MouseEvent, product: Product) => {
-    e.preventDefault();
-    e.stopPropagation();
 
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
-    const isWishlisted = wishlist.some((item) => item.productId === product.id);
-
-    if (isWishlisted) {
-      removeFromWishlist(product.id);
-    } else {
-      addToWishlist(product);
-    }
-  };
 
   // ✅ Filter products by search + category
-  const filteredProducts = allProducts.filter((product) => {
-    const matchesSearch = product?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || product?.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // ✅ Filter products by search + category
+  const filteredProducts = allProducts
+    .filter((product) => {
+      const matchesSearch = product?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === "All" || product?.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (sortBy === "name-asc") {
+        return a.name.localeCompare(b.name);
+      }
+      if (sortBy === "name-desc") {
+        return b.name.localeCompare(a.name);
+      }
+      return 0; // Default order (featured)
+    });
 
   return (
     <Layout>
@@ -135,8 +129,8 @@ const Products = () => {
                         key={category}
                         onClick={() => setSelectedCategory(category)}
                         className={`w-full text-left px-3 py-2 rounded-md transition-smooth ${selectedCategory === category
-                            ? "bg-accent text-accent-foreground"
-                            : "hover:bg-muted"
+                          ? "bg-accent text-accent-foreground"
+                          : "hover:bg-muted"
                           }`}
                       >
                         {category}
@@ -185,9 +179,6 @@ const Products = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProducts.map((product) => {
-                    const isWishlisted =
-                      user && wishlist.some((item) => item.productId === product.id);
-
                     return (
                       <div
                         key={product.id}
@@ -204,15 +195,6 @@ const Products = () => {
                             }
                           />
                           <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-smooth">
-                            <button
-                              onClick={(e) => handleWishlistToggle(e, product)}
-                              className={`w-10 h-10 rounded-full bg-card shadow-elegant flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-smooth ${isWishlisted ? "text-accent" : "text-foreground"
-                                }`}
-                            >
-                              <Heart
-                                className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`}
-                              />
-                            </button>
                             <Link to={`/products/${product.id}`}>
                               <button className="w-10 h-10 rounded-full bg-card shadow-elegant flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-smooth">
                                 <Eye className="w-5 h-5" />
@@ -247,9 +229,9 @@ const Products = () => {
               )}
             </div>
           </div>
-        </div>
-      </section>
-    </Layout>
+        </div >
+      </section >
+    </Layout >
   );
 };
 

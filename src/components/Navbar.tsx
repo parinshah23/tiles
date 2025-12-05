@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import asianTilesLogo from "@/assets/asian-tiles-logo.png";
@@ -13,11 +13,8 @@ export const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 1. Get user AND wishlist from our hook
-  const { user, wishlist } = useAuth();
-
-  // 2. Get the number of items
-  const wishlistItemCount = wishlist ? wishlist.length : 0;
+  // 1. Get user from our hook
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,8 +55,8 @@ export const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-          ? "bg-card/95 backdrop-blur-xl shadow-elegant border-b border-border/50"
-          : "bg-primary/40 backdrop-blur-md"
+        ? "bg-card/95 backdrop-blur-xl shadow-elegant border-b border-border/50"
+        : "bg-primary/40 backdrop-blur-md"
         }`}
     >
       <div className="container mx-auto px-4">
@@ -83,10 +80,10 @@ export const Navbar = () => {
                 key={link.name}
                 to={link.href}
                 className={`relative px-4 py-2 hover:text-accent transition-smooth font-medium group ${isActive(link.href)
-                    ? "text-accent"
-                    : isScrolled
-                      ? "text-foreground"
-                      : "text-primary-foreground"
+                  ? "text-accent"
+                  : isScrolled
+                    ? "text-foreground"
+                    : "text-primary-foreground"
                   }`}
               >
                 {link.name}
@@ -102,25 +99,7 @@ export const Navbar = () => {
           <div className="hidden md:flex items-center gap-2">
             {user ? (
               <>
-                {/* 3. ADDED WISHLIST COUNTER TO DESKTOP */}
-                <Link to="/wishlist" aria-label={`Wishlist${wishlistItemCount > 0 ? ` (${wishlistItemCount} items)` : ""}`}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={`relative ${isScrolled
-                        ? "text-foreground hover:text-accent"
-                        : "text-primary-foreground hover:text-accent"
-                      }`}
-                    aria-label={`Wishlist${wishlistItemCount > 0 ? ` (${wishlistItemCount} items)` : ""}`}
-                  >
-                    <Heart aria-hidden="true" />
-                    {wishlistItemCount > 0 && (
-                      <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white" aria-hidden="true">
-                        {wishlistItemCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
+
                 <Button variant="outline" size="lg" onClick={handleLogout}>
                   Logout
                 </Button>
@@ -181,29 +160,16 @@ export const Navbar = () => {
                 </Link>
               ))}
 
-              {/* 4. ADDED WISHLIST COUNTER TO MOBILE */}
+
               {user ? (
-                <>
-                  <Link
-                    to="/wishlist"
-                    className="flex items-center justify-between text-foreground hover:text-accent transition-smooth font-medium py-2"
-                  >
-                    <span>My Wishlist</span>
-                    {wishlistItemCount > 0 && (
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                        {wishlistItemCount}
-                      </span>
-                    )}
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Button>
-                </>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
               ) : (
                 <>
                   <Link to="/login">
@@ -226,7 +192,7 @@ export const Navbar = () => {
           </div>
         )}
       </div>
-    </nav>
+    </nav >
   );
 };
 

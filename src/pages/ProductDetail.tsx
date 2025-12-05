@@ -24,22 +24,22 @@ type Product = {
   description: string;
   features: string[];
   specifications: { [key: string]: string };
-  [key:string]: any;
+  [key: string]: any;
 };
 
 // Mock related products (can be fetched later)
-const relatedProducts:any[] = [ // Changed to any[] to match usage
+const relatedProducts: any[] = [ // Changed to any[] to match usage
   // { id: 2, name: "Similar Wood Finish", image: "...", price: 48 },
 ];
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, wishlist, addToWishlist, removeFromWishlist } = useAuth();
+  const { user } = useAuth();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [quantity, setQuantity] = useState(1);
+
   const [selectedImage, setSelectedImage] = useState(0);
 
   // FIX: Create a state for the gallery images
@@ -47,7 +47,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!id) return;
-    
+
     const fetchProduct = async () => {
       setLoading(true);
       try {
@@ -60,14 +60,14 @@ const ProductDetail = () => {
             id: docSnap.id,
             ...data,
           } as Product;
-          
+
           setProduct(productData);
 
           // --- FIX FOR IMAGES ---
           // Check if an 'images' array exists (for old products)
           if (data.images && Array.isArray(data.images) && data.images.length > 0) {
             setGalleryImages(data.images);
-          } 
+          }
           // Otherwise, use the single 'image' (for new products)
           else if (data.image) {
             setGalleryImages([data.image]);
@@ -86,23 +86,7 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
-  const handleWishlistToggle = () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    if (!product) return;
-    
-    const isWishlisted = wishlist.some(item => item.productId === product.id);
-    
-    if (isWishlisted) {
-      removeFromWishlist(product.id);
-    } else {
-      addToWishlist(product);
-    }
-  };
 
-  const isWishlisted = user && product && wishlist.some(item => item.productId === product.id);
 
   if (loading) {
     return (
@@ -164,11 +148,10 @@ const ProductDetail = () => {
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-smooth ${
-                        selectedImage === index
+                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-smooth ${selectedImage === index
                           ? "border-accent"
                           : "border-transparent hover:border-muted"
-                      }`}
+                        }`}
                     >
                       <img src={image} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
                     </button>
@@ -221,18 +204,7 @@ const ProductDetail = () => {
 
               {/* Quantity & Actions */}
               <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-semibold text-foreground mb-2 block">
-                    Quantity (sq.ft)
-                  </label>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={quantity}
-                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    className="w-32"
-                  />
-                </div>
+
 
                 <div className="flex gap-3">
                   <Link to="/contact" className="flex-1">
@@ -240,27 +212,19 @@ const ProductDetail = () => {
                       Request Quote
                     </Button>
                   </Link>
-                  <Button 
-                    variant="outline" 
-                    size="lg"
-                    onClick={handleWishlistToggle}
-                    className={isWishlisted ? "text-accent" : ""}
-                  >
-                    <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
-                  </Button>
                 </div>
-                
+
 
                 <Link to="/contact" className="block">
-                <Button variant="outline" size="lg" className="w-full">
-                  Request Sample
-                </Button>
+                  <Button variant="outline" size="lg" className="w-full">
+                    Request Sample
+                  </Button>
                 </Link>
               </div>
 
               {/* Trust Badges */}
               <div className="grid grid-cols-3 gap-4 pt-6 border-t">
-                 {/* ... (Your existing Trust Badges JSX) ... */}
+                {/* ... (Your existing Trust Badges JSX) ... */}
                 <div className="text-center">
                   <Award className="w-8 h-8 text-accent mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">Premium Quality</p>
