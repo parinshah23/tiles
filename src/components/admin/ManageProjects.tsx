@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { db } from "../../firebaseConfig"; // Use relative path
 import { supabase } from "../../supabaseClient"; // Use relative path
-import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, orderBy } from "firebase/firestore";
 import { Button } from "../ui/button"; // Use relative path
 import { Input } from "../ui/input"; // Use relative path
 import { Textarea } from "../ui/textarea"; // Use relative path
@@ -39,6 +39,7 @@ const ManageProjects = () => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // 1. FETCH ALL PROJECTS
   const fetchProjects = async () => {
@@ -73,7 +74,7 @@ const ManageProjects = () => {
   const handleSelectChange = (name: string, value: string) => {
     setFormData({ ...formData, [name]: value });
   };
-  
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
@@ -83,7 +84,7 @@ const ManageProjects = () => {
   // 3. HANDLE FORM SUBMIT (CREATE PROJECT)
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!file) {
+    if (!file && !editingId) {
       setError("Please select an image to upload.");
       return;
     }
@@ -104,21 +105,30 @@ const ManageProjects = () => {
       const { data: urlData } = supabase.storage
         .from("asian-tiles-assets")
         .getPublicUrl(fileName);
-      
+
       const imageUrl = urlData.publicUrl;
 
-      // 3. Prepare data for Firestore
-      const newProject = {
-        ...formData,
-        image: imageUrl,
-      };
-
-      // 4. Save project document to Firestore
-      await addDoc(collection(db, "projects"), newProject);
+      if (editingId) {
+        // UPDATE EXISTING PROJECT
+        const projectRef = doc(db, "projects", editingId);
+        const updatedProject = { ...formData };
+        if (imageUrl) {
+          updatedProject.image = imageUrl;
+        }
+        await updateDoc(projectRef, updatedProject);
+      } else {
+        // CREATE NEW PROJECT
+        const newProject = {
+          ...formData,
+          image: imageUrl!,
+        };
+        await addDoc(collection(db, "projects"), newProject);
+      }
 
       // 5. Reset form and refetch projects
       setFormData(initialFormState);
       setFile(null);
+      setEditingId(null);
       if (e.target instanceof HTMLFormElement) {
         e.target.reset(); // Reset file input
       }
@@ -144,13 +154,38 @@ const ManageProjects = () => {
     }
   };
 
+  // 5. HANDLE EDIT PROJECT
+  const handleEdit = (project: Project) => {
+    setEditingId(project.id);
+    setFormData({
+      title: project.title,
+      client: project.client,
+      category: project.category,
+      location: project.location || "",
+      area: project.area || "",
+      year: project.year || "",
+      description: project.description || "",
+      image: "", // Don't set image, user must re-upload if they want to change it
+    });
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData(initialFormState);
+    setFile(null);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* ADD PROJECT FORM */}
       <Card className="lg:col-span-1">
         <CardHeader>
-          <CardTitle>Add New Project</CardTitle>
-          <CardDescription>Fill out the form to add a new project.</CardDescription>
+          <CardTitle>{editingId ? "Edit Project" : "Add New Project"}</CardTitle>
+          <CardDescription>
+            {editingId ? "Update the project details below." : "Fill out the form to add a new project."}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -158,17 +193,17 @@ const ManageProjects = () => {
               <Label htmlFor="title">Project Title</Label>
               <Input id="title" name="title" value={formData.title} onChange={handleChange} required />
             </div>
-            
+
             <div>
-              <Label htmlFor="image">Project Image</Label>
-              <Input id="image" type="file" onChange={handleFileChange} accept="image/*" required />
+              <Label htmlFor="image">Project Image {editingId && "(Leave empty to keep existing)"}</Label>
+              <Input id="image" type="file" onChange={handleFileChange} accept="image/*" required={!editingId} />
             </div>
 
             <div>
               <Label htmlFor="client">Client Name</Label>
               <Input id="client" name="client" value={formData.client} onChange={handleChange} required />
             </div>
-            
+
             <div>
               <Label htmlFor="category">Category</Label>
               <Select name="category" onValueChange={(value) => handleSelectChange("category", value)} value={formData.category}>
@@ -180,7 +215,7 @@ const ManageProjects = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="location">Location</Label>
               <Input id="location" name="location" value={formData.location} onChange={handleChange} />
@@ -200,12 +235,17 @@ const ManageProjects = () => {
               <Label htmlFor="description">Description</Label>
               <Textarea id="description" name="description" value={formData.description} onChange={handleChange} />
             </div>
-            
+
             {error && <p className="text-red-500 text-sm">{error}</p>}
 
             <Button type="submit" className="w-full" disabled={uploading}>
-              {uploading ? "Uploading..." : "Add Project"}
+              {uploading ? (editingId ? "Updating..." : "Uploading...") : (editingId ? "Update Project" : "Add Project")}
             </Button>
+            {editingId && (
+              <Button type="button" variant="outline" className="w-full" onClick={handleCancelEdit}>
+                Cancel Edit
+              </Button>
+            )}
           </form>
         </CardContent>
       </Card>
@@ -240,7 +280,7 @@ const ManageProjects = () => {
                     <TableCell>{project.client}</TableCell>
                     <TableCell>{project.category}</TableCell>
                     <TableCell>
-                      <Button variant="outline" size="sm" className="mr-2" disabled>Edit</Button>
+                      <Button variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(project)}>Edit</Button>
                       <Button variant="destructive" size="sm" onClick={() => handleDelete(project.id)}>
                         Delete
                       </Button>

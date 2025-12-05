@@ -2,7 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ManageProducts from "@/components/admin/ManageProducts";
 import ManageProjects from "@/components/admin/ManageProjects";
-import ManageCollections from "@/components/admin/ManageCollections";
+
 import ManageDownloads from "@/components/admin/ManageDownloads"; // 1. Import new component
 
 const AdminPage = () => {
@@ -22,24 +22,22 @@ const AdminPage = () => {
       <div className="py-16">
         <div className="container mx-auto px-4">
           <Tabs defaultValue="products" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="products">Products</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="collections">Collections</TabsTrigger>
+
               <TabsTrigger value="downloads">Downloads</TabsTrigger> {/* 2. Add new tab */}
             </TabsList>
-            
+
             <TabsContent value="products" className="mt-6">
               <ManageProducts />
             </TabsContent>
-            
+
             <TabsContent value="projects" className="mt-6">
               <ManageProjects />
             </TabsContent>
-            
-            <TabsContent value="collections" className="mt-6">
-              <ManageCollections />
-            </TabsContent>
+
+
 
             {/* 3. Add new tab content */}
             <TabsContent value="downloads" className="mt-6">
